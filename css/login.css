@@ -1,0 +1,58 @@
+.login-wrap {
+    max-width: 50%;
+    margin: 30px auto;
+    text-align: center;
+    height: 100%;
+  }
+  
+  .login-heading {
+    color: rgb(198, 123, 111);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-size: 40px;
+  }
+  
+  .login-form label {
+    display: block;
+    margin: 15px;
+  }
+  
+  .login-form label input {
+    padding: 10px 8px;
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    outline: none;
+    margin-top: 5px;
+  }
+  
+  .btn-wrap {
+  }
+  
+  .btn-wrap .btn-register {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background-color:red;
+    color: white;
+    width: 80px;
+  }
+  
+  .btn-wrap .btn-register:hover {
+    background-color:rgb(172, 78, 78);
+  }
+  
+  .btn-wrap .btn-login {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background-color:green;
+    color: white;
+    width: 80px;
+  }
+  
+  .btn-wrap .btn-login:hover {
+    background-color:rgb(115, 213, 115);
+  }

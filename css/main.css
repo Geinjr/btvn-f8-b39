@@ -1,0 +1,105 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  ul li {
+    list-style: none;
+  }
+  
+  a {
+    text-decoration: none;
+  }
+  
+  .main-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    color: #c08888;
+  }
+  
+  .main-wrap .btn-main-login {
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #ccc;
+    outline: none;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.2s linear;
+  }
+  
+  .main-wrap .btn-main-login:hover {
+    background-color: #c77d7d;
+    color: white;
+  }
+  
+  th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  th {
+    background-color: #f4f4f4;
+    text-align: center;
+  }
+  
+  td {
+    text-align: center;
+  }
+  
+  button {
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+  
+  .post-container {
+    max-width: 90%;
+    margin: 10px auto;
+  }
+  
+  .post-container .post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .post-header .user-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .post-container .post-header .username {
+    color: rgb(66, 92, 96);
+    font-weight: bold;
+  }
+  
+  .post-header .btn-logout {
+    background-color: orange;
+    padding: 10px 14px;
+    border-radius: 4px;
+  }
+  
+  .post-body h2 {
+    text-align: center;
+  }
+  
+  .post-body .table {
+    margin: 10px auto;
+  }
+  
+  .post-body .table .edit-container {
+    background-color: yellow;
+  }
+  
+  .post-body .table .delete-container {
+    background-color: red;
+  }
