@@ -7,6 +7,8 @@ import { setupHomePage } from './compomets/setuphomepage.js';
 
 
 const app = document.querySelector("#app");
+// const router = new Navigo('/', { hash: true });
+import router from './router/router.js';
 
 const render = async (position, content, setupFn) => {
     const result = typeof content === "function" ? await content() : content();
