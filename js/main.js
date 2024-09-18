@@ -1,14 +1,14 @@
-import Login from './Auth/login.js';
-import { setupLoginPage } from './Auth/setuplogin.js';
-import Signup from './Auth/signup.js';
-import { setupSignupPage } from './Auth/setupsignup.js';
-import HomePage from './compomets/homepage.js';
-import { setupHomePage } from './compomets/setuphomepage.js';
+import Login from '../Auth/login.js';
+import { setupLoginPage } from '../Auth/setuplogin.js';
+import Signup from '../Auth/signup.js';
+import { setupSignupPage } from '../Auth/setupsignup.js';
+import HomePage from '../compomets/homepage.js';
+import { setupHomePage } from '../compomets/setuphomepage.js';
 
 
 const app = document.querySelector("#app");
 // const router = new Navigo('/', { hash: true });
-import router from './router/router.js';
+import router from '../router/router.js';
 
 const render = async (position, content, setupFn) => {
     const result = typeof content === "function" ? await content() : content();
@@ -17,15 +17,17 @@ const render = async (position, content, setupFn) => {
         setupFn(); 
     }
 };
-
+s
 router
     .on("/", async () => {
         await render(app, HomePage , setupHomePage);
     })
-    .on("/login", () => {
+    .on("/login", async() => {
+        await render(app, HomePage , setupHomePage);
         render(app, Login, setupLoginPage); // Gọi setupLoginPage sau khi render Login
     })
-    .on("/signup", () => {
+    .on("/signup",async () => {
+        await render(app, HomePage , setupHomePage);
         render(app, Signup, setupSignupPage); // Gọi setupSignupPage sau khi render Signup
     });
 
