@@ -6,8 +6,6 @@ import HomePage from './compomets/homepage.js';
 import { setupHomePage } from './compomets/setuphomepage.js';
 
 
-const app = document.querySelector("#app");
-const router = new Navigo("/", { linksSelector: "a", hash: true });
 
 const render = async (position, content, setupFn) => {
     const result = typeof content === "function" ? await content() : content();
