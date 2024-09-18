@@ -17,7 +17,7 @@ const render = async (position, content, setupFn) => {
         setupFn(); 
     }
 };
-s
+
 router
     .on("/", async () => {
         await render(app, HomePage , setupHomePage);
