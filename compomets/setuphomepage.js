@@ -1,30 +1,34 @@
-
 import router from '../router/router.js';
 import HomePage from './HomePage.js';
 
 const SERVER_API = "http://103.159.51.69:2000";
 
+const fetchWithToken = async (url, method, accessToken, body = null) => {
+  const options = {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${accessToken}`
+    }
+  };
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(`${SERVER_API}${url}`, options);
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || "Failed to fetch");
+  }
+
+  return response.json();
+};
+
 const getNewAccessToken = async () => {
   try {
-    const response = await fetch(`${SERVER_API}/login/get_new_token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        "refresh": localStorage.getItem("refresh-token")
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to refresh access token");
-    }
-
-    const data = await response.json();
-
+    const data = await fetchWithToken("/login/get_new_token", "POST", "", { refresh: localStorage.getItem("refresh-token") });
     localStorage.setItem("access-token", data.access);
     localStorage.setItem("refresh-token", data.refresh);
-
     return data.access;
   } catch (error) {
     console.log("Error when getting new access token:", error);
@@ -34,27 +38,33 @@ const getNewAccessToken = async () => {
   }
 };
 
-const getPosts = async (accessToken) => {
-  try {
-    let response = await fetch(`${SERVER_API}/post`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${accessToken}`
-      }
+const setupLogoutButton = () => {
+  const btnLogout = document.querySelector(".btn-logout");
+  if (btnLogout) {
+    btnLogout.addEventListener("click", () => {
+      localStorage.clear();
+      router.navigate("/login");
     });
-
-    if (!response.ok) {
-      const { detail } = await response.json()
-      throw new Error(detail);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.log("Error when fetching posts:", error);
-    throw error;
   }
+};
+
+const renderPosts = (posts) => {
+  const postsHtml = posts.map(post => `
+    <tr>
+      <td>${post.id}</td>
+      <td>${post.title}</td>
+      <td>${post.content}</td>
+      <td class="edit-container">
+        <button class="edit-btn">Edit</button>
+      </td>
+      <td class="delete-container">
+        <button class="delete-btn">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+
+  document.querySelector("#app").innerHTML = HomePage(postsHtml);
+  setupLogoutButton();
 };
 
 export const setupHomePage = async () => {
@@ -66,56 +76,19 @@ export const setupHomePage = async () => {
     return;
   }
 
-  const setupLogoutButton = () => {
-    const btnLogout = document.querySelector(".btn-logout");
-    if (btnLogout) {
-      btnLogout.addEventListener("click", function () {
-        localStorage.clear();
-        router.navigate("/login");
-      });
-    }
-  };
-
-  const renderPosts = (posts) => {
-    const postsHtml = posts.map(post => `
-      <tr>
-        <td>${post.id}</td>
-        <td>${post.title}</td>
-        <td>${post.content}</td>
-        <td class="edit-container">
-          <button class="edit-btn">Edit</button>
-        </td>
-        <td class="delete-container">
-          <button class="delete-btn">Delete</button>
-        </td>
-      </tr>
-    `).join('');
-
-    document.querySelector("#app").innerHTML = HomePage(postsHtml);
-    setupLogoutButton(); // Chỉ cần gọi sau khi render xong
-  };
-
   const loadPosts = async () => {
     try {
-      let posts = await getPosts(accessToken);
+      const posts = await fetchWithToken("/post", "GET", accessToken);
       renderPosts(posts);
     } catch (error) {
-      console.log("Error when loading posts:", error);
       if (error.message === "token expired") {
         const newAccessToken = await getNewAccessToken();
         if (newAccessToken) {
-          accessToken = newAccessToken;
-          try {
-            const posts = await getPosts(newAccessToken);
-            renderPosts(posts);
-          } catch (retryError) {
-            console.log("Error when retrying fetch posts:", retryError);
-            router.navigate("/login");
-          }
-        } else {
-          router.navigate("/login");
+          const posts = await fetchWithToken("/post", "GET", newAccessToken);
+          renderPosts(posts);
         }
       } else {
+        console.log("Error when fetching posts:", error);
         router.navigate("/login");
       }
     }

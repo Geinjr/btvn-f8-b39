@@ -47,8 +47,8 @@ export const setupLoginPage = async () => {
                 }
 
                 const { access, refresh } = await response.json();
-                localStorage.setItem("access_token", access);
-                localStorage.setItem("refresh_token", refresh);
+                localStorage.setItem("access-token", access);
+                localStorage.setItem("refresh-token", refresh);
 
                 // Điều hướng về trang chính
                 router.navigate('/');
