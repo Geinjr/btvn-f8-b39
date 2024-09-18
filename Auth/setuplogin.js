@@ -40,9 +40,9 @@ export const setupLoginPage = async () => {
                     })
                 });
 
+                // const errorData = await response.json();
                 if (!response.ok) {
                     // Thêm logic xử lý lỗi chi tiết dựa trên mã phản hồi HTTP
-                    const errorData = await response.json();
                     throw new Error(errorData.message || "Đăng nhập tài khoản không thành công");
                 }
 

@@ -1,138 +1,125 @@
 
-
-import router from "../router/router.js";
-import HomePage from "./homepage.js";
+import router from '../router/router.js';
+import HomePage from './HomePage.js';
 
 const SERVER_API = "http://103.159.51.69:2000";
 
-const getNewToken = async () => {
-    try {
-        const response = await fetch(`${SERVER_API}/get_new_token`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                "refresh": localStorage.getItem("refresh_token")  // Sửa thành refresh_token
-            }),
-        });
+const getNewAccessToken = async () => {
+  try {
+    const response = await fetch(`${SERVER_API}/login/get_new_token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "refresh": localStorage.getItem("refresh-token")
+      })
+    });
 
-        if (!response.ok) {
-            throw new Error(`Failed to refresh access token`);
-        }
-
-        // Sửa để sử dụng response.json() đúng cách
-        const data = await response.json();
-
-        // Sử dụng biến data để lấy access và refresh
-        localStorage.setItem("access_token", data.access);
-        localStorage.setItem("refresh_token", data.refresh);
-
-        return data.access;
-    } catch (error) {
-        console.error('Failed to get new tokens:', error);
-        localStorage.clear();
-        router.navigate("/login");
-        return null;
+    if (!response.ok) {
+      throw new Error("Failed to refresh access token");
     }
+
+    const data = await response.json();
+
+    localStorage.setItem("access-token", data.access);
+    localStorage.setItem("refresh-token", data.refresh);
+
+    return data.access;
+  } catch (error) {
+    console.log("Error when getting new access token:", error);
+    localStorage.clear();
+    router.navigate("/login");
+    return null;
+  }
 };
 
-const getPost = async (access_token) => {
-    try {
-        const response = await fetch(`${SERVER_API}/post`, {
-            method: "POST",  // Sửa thành chuỗi "POST"
-            headers: {       // Sửa "header" thành "headers"
-                "Content-Type": "application/json",
-                "Authorization": "bearer <access_token>"
-            }
-        });
+const getPosts = async (accessToken) => {
+  try {
+    let response = await fetch(`${SERVER_API}/post`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`
+      }
+    });
 
-       
-
-        if (!response.ok) {
-            const { detail } = await response.json();  // Sửa để gọi response.json() đúng cách
-            throw new Error(detail);
-        }
-
-        const data = await response.json();  // Sửa để gọi response.json() đúng cách
-        return data;
-
-    } catch (error) {
-        console.error("Error when fetching posts:", error);  // Sửa thành 'error' thay vì 'e'
-        throw error;
+    if (!response.ok) {
+      const { detail } = await response.json()
+      throw new Error(detail);
     }
-};
 
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log("Error when fetching posts:", error);
+    throw error;
+  }
+};
 
 export const setupHomePage = async () => {
-    let access_token = localStorage.getItem("access_token");
-    const refresh_token = localStorage.getItem("refresh_token");
-  
-    if (!access_token || !refresh_token) {
-      router.navigate("/login");
-      return;
+  let accessToken = localStorage.getItem("access-token");
+  const refreshToken = localStorage.getItem("refresh-token");
+
+  if (!accessToken || !refreshToken) {
+    router.navigate("/login");
+    return;
+  }
+
+  const setupLogoutButton = () => {
+    const btnLogout = document.querySelector(".btn-logout");
+    if (btnLogout) {
+      btnLogout.addEventListener("click", function () {
+        localStorage.clear();
+        router.navigate("/login");
+      });
     }
-    const logoutBtn = () => {
-        const btnLogout = document.querySelector(".btn-logout");
-        btnLogout.addEventListener("click", function(e) {
-          localStorage.clear();
-          router.navigate("/login");
-        });
-      };
-    
-      const renderPost = (posts) => {
-        const postsHtml = posts.map(post =>
-          `
-          <tr>
-            <td>${post.id}</td>
-            <td>${post.title}</td>
-            <td>${post.content}</td>
-            <td class="edit-container">
-              <button class="edit-btn">Edit</button>
-            </td>
-            <td class="delete-container">
-              <button class="delete-btn">Delete</button>
-            </td>
-          </tr>
-          `
-        ).join("");
-        
-        document.querySelector("#app").innerHTML = HomePage(postsHtml);
-        logoutBtn();
-      };
-    
-      
-      const loadPosts = async () => {
-        try {
-          let posts = await getPosts(access_token);
-          renderPosts(posts);
-        } catch (error) {
-          console.log("Error when loading posts:", error);
-          if (error.message === "token expired") {
-            const newAccessToken = await getNewToken();
-            if (newAccessToken) {
-              try {
-                // Cập nhật access_token bằng token mới
-                access_token = newAccessToken;
-                const posts = await getPosts(newAccessToken);
-                renderPosts(posts);
-              } catch (error2) {
-                console.log("Error when retrying fetch posts:", error2);
-                router.navigate("/login");
-              }
-            } else {
-              router.navigate("/login");
-            }
-          } else {
+  };
+
+  const renderPosts = (posts) => {
+    const postsHtml = posts.map(post => `
+      <tr>
+        <td>${post.id}</td>
+        <td>${post.title}</td>
+        <td>${post.content}</td>
+        <td class="edit-container">
+          <button class="edit-btn">Edit</button>
+        </td>
+        <td class="delete-container">
+          <button class="delete-btn">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+
+    document.querySelector("#app").innerHTML = HomePage(postsHtml);
+    setupLogoutButton(); // Chỉ cần gọi sau khi render xong
+  };
+
+  const loadPosts = async () => {
+    try {
+      let posts = await getPosts(accessToken);
+      renderPosts(posts);
+    } catch (error) {
+      console.log("Error when loading posts:", error);
+      if (error.message === "token expired") {
+        const newAccessToken = await getNewAccessToken();
+        if (newAccessToken) {
+          accessToken = newAccessToken;
+          try {
+            const posts = await getPosts(newAccessToken);
+            renderPosts(posts);
+          } catch (retryError) {
+            console.log("Error when retrying fetch posts:", retryError);
             router.navigate("/login");
           }
+        } else {
+          router.navigate("/login");
         }
-      };
-      
-    await loadPosts();
-    logoutBtn()
-    
+      } else {
+        router.navigate("/login");
+      }
+    }
   };
-  
 
-  
+  await loadPosts();
+};

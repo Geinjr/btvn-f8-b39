@@ -39,10 +39,6 @@ export const setupSignupPage = () => {
             });
 
 
-            console.log("Response status:", response.status);  // In mã trạng thái phản hồi
-            const responseBody = await response.json();
-            console.log("Response body:", responseBody); 
-            // Kiểm tra phản hồi từ server
             if (!response.ok) {
                 throw new Error("Đăng ký tài khoản không thành công");
             }
