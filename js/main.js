@@ -4,11 +4,11 @@ import Signup from '../Auth/signup.js';
 import { setupSignupPage } from '../Auth/setupsignup.js';
 import HomePage from '../compomets/homepage.js';
 import { setupHomePage } from '../compomets/setuphomepage.js';
-
+import router from '../router/router.js';
 
 const app = document.querySelector("#app");
 // const router = new Navigo('/', { hash: true });
-import router from '../router/router.js';
+
 
 const render = async (position, content, setupFn) => {
     const result = typeof content === "function" ? await content() : content();

@@ -1,5 +1,5 @@
 import router from '../router/router.js';
-import HomePage from './HomePage.js';
+import HomePage from '../compomets/homepage.js';
 
 const SERVER_API = "http://103.159.51.69:2000";
 
